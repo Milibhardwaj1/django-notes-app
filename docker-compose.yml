@@ -6,6 +6,7 @@ services:
     image: milibh98/notes-app
     ports:
       - "8000:8000"
+    restart: always
 
 # services:
 #   nginx:
