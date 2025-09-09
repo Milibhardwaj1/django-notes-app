@@ -1,29 +1,44 @@
-@Library('Shared')_
+@Library("Shared") _
 pipeline{
-    agent { label 'dev-server'}
-    
+    agent{label "vinod"}
     stages{
-        stage("Code clone"){
+        stage("Hello"){
             steps{
-                sh "whoami"
-            clone("https://github.com/LondheShubham153/django-notes-app.git","main")
+                script{
+                    hello()
+                }
             }
         }
-        stage("Code Build"){
+        stage("Clone the code"){
             steps{
-            dockerbuild("notes-app","latest")
+                echo "This is checking if the repo is already cloned"
+                script {
+                    if (!fileExists('.git')) {
+                        clone("https://github.com/Milibhardwaj1/django-notes-app.git", "main")
+                    } else {
+                        echo "Repo already cloned, skipping fetch"
+                    }
+                }
             }
         }
-        stage("Push to DockerHub"){
+        stage("Build Image"){
             steps{
-                dockerpush("dockerHubCreds","notes-app","latest")
+                script{
+                    docker_build("notes-app", "latest", "milibh98")
+                }
             }
+            
         }
         stage("Deploy"){
             steps{
-                deploy()
+                echo "This is deploying the code"
+                sh "docker compose up -d"
             }
         }
-        
+        stage("Push"){
+            steps{
+                docker_push("notes-app","latest", "milibh98")
+            }
+        }
     }
 }
